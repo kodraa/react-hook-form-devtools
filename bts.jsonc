@@ -4,23 +4,22 @@
 {
   "$schema": "https://r2.better-t-stack.dev/schema.json",
   "version": "3.6.4",
-  "createdAt": "2025-11-26T15:58:31.101Z",
-  "database": "postgres",
-  "orm": "drizzle",
-  "backend": "elysia",
-  "runtime": "bun",
+  "createdAt": "2025-11-26T19:26:56.091Z",
+  "database": "none",
+  "orm": "none",
+  "backend": "none",
+  "runtime": "none",
   "frontend": [
     "tanstack-start"
   ],
   "addons": [
-    "fumadocs",
     "turborepo"
   ],
   "examples": [],
-  "auth": "better-auth",
+  "auth": "none",
   "packageManager": "bun",
-  "dbSetup": "docker",
-  "api": "orpc",
+  "dbSetup": "none",
+  "api": "none",
   "webDeploy": "none",
   "serverDeploy": "none"
 }

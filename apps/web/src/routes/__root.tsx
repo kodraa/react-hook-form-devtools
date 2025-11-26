@@ -1,7 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
 
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
 import {
 	HeadContent,
 	Outlet,
@@ -11,13 +9,8 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import Header from "../components/header";
 import appCss from "../index.css?url";
-import type { QueryClient } from "@tanstack/react-query";
 
-import type { orpc } from "@/utils/orpc";
-export interface RouterAppContext {
-	orpc: typeof orpc;
-	queryClient: QueryClient;
-}
+export interface RouterAppContext {}
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
 	head: () => ({
@@ -57,7 +50,6 @@ function RootDocument() {
 				</div>
 				<Toaster richColors />
 				<TanStackRouterDevtools position="bottom-left" />
-				<ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
 				<Scripts />
 			</body>
 		</html>

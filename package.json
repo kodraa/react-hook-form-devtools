@@ -13,7 +13,9 @@
     "dev:native": "turbo -F native dev",
     "dev:web": "turbo -F web dev"
   },
-  "dependencies": {},
+  "dependencies": {
+    "react-hook-form": "^7.66.1"
+  },
   "devDependencies": {
     "turbo": "^2.5.4"
   },

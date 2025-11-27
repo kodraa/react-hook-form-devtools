@@ -89,6 +89,29 @@ Event client for manual integration or custom functionality.
 
 - `emit(event, payload)` - Emit an event to the devtools
 - `on(event, handler)` - Subscribe to devtools events
+- `registerFormMethods(formId, formMethods)` - Register form methods for a form (automatically called by `useRHFDevtools`)
+- `getFormMethods(formId)` - Retrieve form methods for a given form ID
+- `unregisterFormMethods(formId)` - Unregister form methods when a form is unmounted
+- `getRegisteredFormIds()` - Get all registered form IDs
+- `hasFormMethods(formId)` - Check if a form is registered
+
+**Accessing Form Methods:**
+
+Form methods (like `setValue`, `reset`, `trigger`, etc.) cannot be serialized through the event system. Instead, they're stored in a separate store and can be accessed directly:
+
+```tsx
+import { DevtoolsEventClient } from "@/lib/rhf-devtools";
+
+// In your DevTools panel or any component
+const formMethods = DevtoolsEventClient.getFormMethods("my-form-id");
+
+if (formMethods) {
+  // Now you can call any form method
+  formMethods.reset(); // Reset the form
+  formMethods.setValue("fieldName", "newValue"); // Set a field value
+  formMethods.trigger(); // Trigger validation
+}
+```
 
 ## Extension Points
 
@@ -120,6 +143,22 @@ DevtoolsEventClient.emit("custom-event", { data: "my data" });
 ### 3. Extend the Panel UI
 
 Modify `DevtoolsPanel.tsx` to add additional UI elements, tabs, or visualizations.
+
+### 4. Add Interactive Actions
+
+You can add buttons or controls in the DevTools panel that interact with forms:
+
+```tsx
+// In your DevtoolsPanel component
+const formMethods = DevtoolsEventClient.getFormMethods(selectedFormId);
+
+// Add buttons for common actions
+<button onClick={() => formMethods?.reset()}>Reset Form</button>
+<button onClick={() => formMethods?.trigger()}>Validate Form</button>
+<button onClick={() => formMethods?.setValue("fieldName", "value")}>
+  Set Field Value
+</button>
+```
 
 ## Architecture
 

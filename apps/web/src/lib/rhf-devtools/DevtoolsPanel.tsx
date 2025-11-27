@@ -44,6 +44,23 @@ export default function RHFDevtoolsPanel() {
 
   const selectedForm = forms.find((f) => f.formId === selectedFormId);
 
+  // Access form methods using the store (not from events)
+  // You can use this to call methods like: setValue, reset, trigger, etc.
+  const selectedFormMethods = selectedFormId
+    ? DevtoolsEventClient.getFormMethods(selectedFormId)
+    : undefined;
+
+  // Example: Log form methods when available (can be used for debugging or actions)
+  useEffect(() => {
+    if (selectedFormMethods) {
+      console.log(
+        "Form methods available for:",
+        selectedFormId,
+        selectedFormMethods
+      );
+    }
+  }, [selectedFormId, selectedFormMethods]);
+
   return (
     <div style={{ padding: "16px", fontFamily: "monospace", fontSize: "12px" }}>
       <h3
@@ -56,37 +73,41 @@ export default function RHFDevtoolsPanel() {
         <div style={{ color: "#888" }}>No forms registered yet...</div>
       ) : (
         <>
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", marginBottom: "4px" }}>
-              Select Form:
-            </label>
-            <select
-              value={selectedFormId || ""}
-              onChange={(e) => setSelectedFormId(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "4px 8px",
-                borderRadius: "4px",
-                border: "1px solid #333",
-                background: "#1a1a1a",
-                color: "#fff",
-              }}
-            >
-              <option value="">Select a form...</option>
-              {forms.map((form) => (
-                <option key={form.formId} value={form.formId}>
-                  {form.formId}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectForm
+            forms={forms}
+            selectedFormId={selectedFormId}
+            setSelectedFormId={setSelectedFormId}
+          />
 
           {selectedForm && (
             <div>
               <div style={{ marginBottom: "12px" }}>
-                <h4 style={{ margin: "0 0 8px 0", fontSize: "13px" }}>
-                  Form State
-                </h4>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "8px",
+                  }}
+                >
+                  <h4 style={{ margin: "0", fontSize: "13px" }}>Form State</h4>
+                  {selectedFormMethods && (
+                    <button
+                      onClick={() => selectedFormMethods.reset()}
+                      style={{
+                        padding: "4px 8px",
+                        fontSize: "11px",
+                        borderRadius: "4px",
+                        border: "1px solid #3b82f6",
+                        background: "#1e40af",
+                        color: "#fff",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Reset Form
+                    </button>
+                  )}
+                </div>
                 <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                   <span
                     style={{
@@ -218,3 +239,46 @@ export default function RHFDevtoolsPanel() {
     </div>
   );
 }
+
+const SelectForm = ({
+  forms,
+  selectedFormId,
+  setSelectedFormId,
+}: {
+  forms: FormState[];
+  selectedFormId: string | null;
+  setSelectedFormId: (formId: string) => void;
+}) => {
+  useEffect(() => {
+    if (forms.length === 1) {
+      setSelectedFormId(forms[0].formId);
+    }
+  }, [forms, setSelectedFormId]);
+
+  return (
+    <div style={{ marginBottom: "16px" }}>
+      <label style={{ display: "block", marginBottom: "4px" }}>
+        Select Form:
+      </label>
+      <select
+        value={selectedFormId || ""}
+        onChange={(e) => setSelectedFormId(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "4px 8px",
+          borderRadius: "4px",
+          border: "1px solid #333",
+          background: "#1a1a1a",
+          color: "#fff",
+        }}
+      >
+        <option value="">Select a form...</option>
+        {forms.map((form) => (
+          <option key={form.formId} value={form.formId}>
+            {form.formId}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};

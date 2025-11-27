@@ -9,6 +9,9 @@ import { DevtoolsEventClient } from "./eventClient";
  */
 export function useRHFDevtools(form: UseFormReturn<any>, formId: string) {
   useEffect(() => {
+    // Register form methods in the store (bypasses event serialization)
+    DevtoolsEventClient.registerFormMethods(formId, form);
+
     // Subscribe to form state changes
     const subscription = form.subscribe({
       formState: {
@@ -34,7 +37,6 @@ export function useRHFDevtools(form: UseFormReturn<any>, formId: string) {
         // Emit the current form state to the devtools
         DevtoolsEventClient.emit("form-state", {
           formId,
-          // formMethods: form,
           values: form.getValues(),
           errors,
           isDirty,
@@ -48,6 +50,8 @@ export function useRHFDevtools(form: UseFormReturn<any>, formId: string) {
 
     return () => {
       subscription();
+      // Unregister form methods when component unmounts
+      DevtoolsEventClient.unregisterFormMethods(formId);
     };
   }, [form, formId]);
 }

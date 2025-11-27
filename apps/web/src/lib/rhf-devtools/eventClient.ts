@@ -3,7 +3,6 @@ import type { UseFormReturn } from "react-hook-form";
 
 export type FormState = {
   formId: string;
-  formMethods: UseFormReturn;
   values: Record<string, any>;
   errors: Record<string, any>;
   isDirty: boolean;
@@ -21,12 +20,51 @@ type EventMap = {
 };
 
 class RHFDevtoolsEventClient extends EventClient<EventMap> {
+  // Store for formMethods that can't be serialized through events
+  private formMethodsStore: Map<string, UseFormReturn> = new Map();
+
   constructor() {
     super({
       // The pluginId must match that of the event map key
       pluginId: "rhf-devtools",
       debug: false,
     });
+  }
+
+  /**
+   * Register form methods for a given formId
+   * This bypasses the event system to avoid serialization issues
+   */
+  registerFormMethods(formId: string, formMethods: UseFormReturn) {
+    this.formMethodsStore.set(formId, formMethods);
+  }
+
+  /**
+   * Retrieve form methods for a given formId
+   */
+  getFormMethods(formId: string): UseFormReturn | undefined {
+    return this.formMethodsStore.get(formId);
+  }
+
+  /**
+   * Unregister form methods when a form is unmounted
+   */
+  unregisterFormMethods(formId: string) {
+    this.formMethodsStore.delete(formId);
+  }
+
+  /**
+   * Get all registered form IDs
+   */
+  getRegisteredFormIds(): string[] {
+    return Array.from(this.formMethodsStore.keys());
+  }
+
+  /**
+   * Check if a form is registered
+   */
+  hasFormMethods(formId: string): boolean {
+    return this.formMethodsStore.has(formId);
   }
 }
 

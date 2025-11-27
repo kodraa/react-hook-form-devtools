@@ -9,7 +9,6 @@ import { DevtoolsEventClient } from "./eventClient";
  */
 export function useRHFDevtools(form: UseFormReturn<any>, formId: string) {
   useEffect(() => {
-    console.log("useRHFDevtools", form, formId);
     // Subscribe to form state changes
     const subscription = form.subscribe({
       formState: {
@@ -32,11 +31,10 @@ export function useRHFDevtools(form: UseFormReturn<any>, formId: string) {
           },
         } = form;
 
-        console.log("form state", form.getValues());
-
         // Emit the current form state to the devtools
         DevtoolsEventClient.emit("form-state", {
           formId,
+          // formMethods: form,
           values: form.getValues(),
           errors,
           isDirty,

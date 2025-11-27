@@ -1,7 +1,9 @@
 import { EventClient } from "@tanstack/devtools-event-client";
+import type { UseFormReturn } from "react-hook-form";
 
 export type FormState = {
   formId: string;
+  formMethods: UseFormReturn;
   values: Record<string, any>;
   errors: Record<string, any>;
   isDirty: boolean;

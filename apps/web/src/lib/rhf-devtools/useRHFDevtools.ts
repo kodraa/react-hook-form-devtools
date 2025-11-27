@@ -9,106 +9,47 @@ import { DevtoolsEventClient } from "./eventClient";
  */
 export function useRHFDevtools(form: UseFormReturn<any>, formId: string) {
   useEffect(() => {
-    const {
+    console.log("useRHFDevtools", form, formId);
+    // Subscribe to form state changes
+    const subscription = form.subscribe({
       formState: {
-        errors,
-        isDirty,
-        isValid,
-        isSubmitting,
-        touchedFields,
-        dirtyFields,
+        errors: true,
+        isDirty: true,
+        isValid: true,
+        touchedFields: true,
+        dirtyFields: true,
+        values: true,
       },
-    } = form;
+      callback: () => {
+        const {
+          formState: {
+            errors,
+            isDirty,
+            isValid,
+            isSubmitting,
+            touchedFields,
+            dirtyFields,
+          },
+        } = form;
 
-    console.log("emitting form state", {
-      formId,
-      values: form.getValues(),
-      errors,
-      isDirty,
-      isValid,
-      isSubmitting,
-      touchedFields,
-      dirtyFields,
+        console.log("form state", form.getValues());
+
+        // Emit the current form state to the devtools
+        DevtoolsEventClient.emit("form-state", {
+          formId,
+          values: form.getValues(),
+          errors,
+          isDirty,
+          isValid,
+          isSubmitting,
+          touchedFields,
+          dirtyFields,
+        });
+      },
     });
 
-    // Emit the current form state to the devtools
-    DevtoolsEventClient.emit("form-state", {
-      formId,
-      values: form.getValues(),
-      errors,
-      isDirty,
-      isValid,
-      isSubmitting,
-      touchedFields,
-      dirtyFields,
-    });
-  }, []);
-
-  // useEffect(() => {
-  //   console.log("useRHFDevtools", form, formId);
-  //   // Subscribe to form state changes
-  //   const subscription = form.subscribe({
-  //     formState: {
-  //       errors: true,
-  //       isDirty: true,
-  //       isValid: true,
-  //       touchedFields: true,
-  //       dirtyFields: true,
-  //       values: true,
-  //     },
-  //     callback: () => {
-  //       const {
-  //         formState: {
-  //           errors,
-  //           isDirty,
-  //           isValid,
-  //           isSubmitting,
-  //           touchedFields,
-  //           dirtyFields,
-  //         },
-  //       } = form;
-
-  //       console.log("form state", form.getValues());
-
-  //       // Emit the current form state to the devtools
-  //       DevtoolsEventClient.emit("form-state", {
-  //         formId,
-  //         values: form.getValues(),
-  //         errors,
-  //         isDirty,
-  //         isValid,
-  //         isSubmitting,
-  //         touchedFields,
-  //         dirtyFields,
-  //       });
-  //     },
-  //   });
-
-  //   // // Emit initial state
-  //   // const {
-  //   //   formState: {
-  //   //     errors,
-  //   //     isDirty,
-  //   //     isValid,
-  //   //     isSubmitting,
-  //   //     touchedFields,
-  //   //     dirtyFields,
-  //   //   },
-  //   // } = form;
-
-  //   // DevtoolsEventClient.emit("form-state", {
-  //   //   formId,
-  //   //   values: form.getValues(),
-  //   //   errors,
-  //   //   isDirty,
-  //   //   isValid,
-  //   //   isSubmitting,
-  //   //   touchedFields,
-  //   //   dirtyFields,
-  //   // });
-
-  //   return () => {
-  //     subscription();
-  //   };
-  // }, [form, formId]);
+    return () => {
+      subscription();
+    };
+  }, [form, formId]);
 }

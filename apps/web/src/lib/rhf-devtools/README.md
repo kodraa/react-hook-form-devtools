@@ -213,4 +213,3 @@ Some ideas for extending the devtools:
 - **Performance metrics**: Monitor render counts and re-renders
 - **Form validation testing**: Test validation rules directly in the devtools
 - **State snapshots**: Save and restore form states
-- **Multiple form comparison**: Compare state across different forms

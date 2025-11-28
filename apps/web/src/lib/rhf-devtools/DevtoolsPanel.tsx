@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { DevtoolsEventClient } from "./eventClient";
+import { useFormContext, useWatch } from "react-hook-form";
+import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronRight, Plus, X } from "lucide-react";
 
 export default function RHFDevtoolsPanel() {
   const [formIds, setFormIds] = useState<Array<string>>([]);
@@ -78,19 +82,21 @@ export default function RHFDevtoolsPanel() {
             setSelectedFormId={setSelectedFormId}
           />
 
-          {formState && (
-            <div>
-              <div style={{ marginBottom: "12px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "8px",
-                  }}
-                >
-                  <h4 style={{ margin: "0", fontSize: "13px" }}>Form State</h4>
-                  {formMethods && (
+          {formState && formMethods && (
+            <Form {...formMethods}>
+              <div>
+                <div style={{ marginBottom: "12px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <h4 style={{ margin: "0", fontSize: "13px" }}>
+                      Form State
+                    </h4>
                     <button
                       onClick={() =>
                         formMethods.reset({
@@ -111,107 +117,102 @@ export default function RHFDevtoolsPanel() {
                     >
                       Reset Form
                     </button>
-                  )}
-                </div>
-                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                  <span
-                    style={{
-                      padding: "2px 6px",
-                      borderRadius: "4px",
-                      background: formState.isDirty ? "#f59e0b" : "#374151",
-                    }}
+                  </div>
+                  <div
+                    style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}
                   >
-                    {formState.isDirty ? "Dirty" : "Pristine"}
-                  </span>
-                  <span
-                    style={{
-                      padding: "2px 6px",
-                      borderRadius: "4px",
-                      background: formState.isValid ? "#10b981" : "#ef4444",
-                    }}
-                  >
-                    {formState.isValid ? "Valid" : "Invalid"}
-                  </span>
-                  {formState.isSubmitting && (
                     <span
                       style={{
                         padding: "2px 6px",
                         borderRadius: "4px",
-                        background: "#3b82f6",
+                        background: formState.isDirty ? "#f59e0b" : "#374151",
                       }}
                     >
-                      Submitting
+                      {formState.isDirty ? "Dirty" : "Pristine"}
                     </span>
-                  )}
-                </div>
-              </div>
-
-              <div style={{ marginBottom: "12px" }}>
-                <h4 style={{ margin: "0 0 8px 0", fontSize: "13px" }}>
-                  Values
-                </h4>
-                <pre
-                  style={{
-                    margin: 0,
-                    padding: "8px",
-                    background: "#1a1a1a",
-                    borderRadius: "4px",
-                    overflow: "auto",
-                    maxHeight: "200px",
-                  }}
-                >
-                  {JSON.stringify(formState.values, null, 2)}
-                </pre>
-              </div>
-
-              {Object.keys(formState.touchedFields).length > 0 && (
-                <div style={{ marginBottom: "12px" }}>
-                  <h4 style={{ margin: "0 0 8px 0", fontSize: "13px" }}>
-                    Touched Fields
-                  </h4>
-                  <div
-                    style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}
-                  >
-                    {Object.keys(formState.touchedFields).map((field) => (
+                    <span
+                      style={{
+                        padding: "2px 6px",
+                        borderRadius: "4px",
+                        background: formState.isValid ? "#10b981" : "#ef4444",
+                      }}
+                    >
+                      {formState.isValid ? "Valid" : "Invalid"}
+                    </span>
+                    {formState.isSubmitting && (
                       <span
-                        key={field}
                         style={{
                           padding: "2px 6px",
                           borderRadius: "4px",
-                          background: "#374151",
+                          background: "#3b82f6",
                         }}
                       >
-                        {field}
+                        Submitting
                       </span>
-                    ))}
+                    )}
                   </div>
                 </div>
-              )}
 
-              {Object.keys(formState.dirtyFields).length > 0 && (
+                <ValuesSection values={formState.values} />
+
+                {Object.keys(formState.touchedFields).length > 0 && (
+                  <div style={{ marginBottom: "12px" }}>
+                    <h4 style={{ margin: "0 0 8px 0", fontSize: "13px" }}>
+                      Touched Fields
+                    </h4>
+                    <div
+                      style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}
+                    >
+                      {Object.keys(formState.touchedFields).map((field) => (
+                        <span
+                          key={field}
+                          style={{
+                            padding: "2px 6px",
+                            borderRadius: "4px",
+                            background: "#374151",
+                          }}
+                        >
+                          {field}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {Object.keys(formState.dirtyFields).length > 0 && (
+                  <div>
+                    <h4 style={{ margin: "0 0 8px 0", fontSize: "13px" }}>
+                      Dirty Fields
+                    </h4>
+                    <div
+                      style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}
+                    >
+                      {Object.keys(formState.dirtyFields).map((field) => (
+                        <span
+                          key={field}
+                          style={{
+                            padding: "2px 6px",
+                            borderRadius: "4px",
+                            background: "#374151",
+                          }}
+                        >
+                          {field}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <GetValuesOnDemand />
+
                 <div>
                   <h4 style={{ margin: "0 0 8px 0", fontSize: "13px" }}>
-                    Dirty Fields
+                    Watched Fields
                   </h4>
-                  <div
-                    style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}
-                  >
-                    {Object.keys(formState.dirtyFields).map((field) => (
-                      <span
-                        key={field}
-                        style={{
-                          padding: "2px 6px",
-                          borderRadius: "4px",
-                          background: "#374151",
-                        }}
-                      >
-                        {field}
-                      </span>
-                    ))}
-                  </div>
+                  <WatchedFields />
                 </div>
-              )}
-            </div>
+              </div>
+            </Form>
           )}
         </>
       )}
@@ -262,12 +263,254 @@ const SelectForm = ({
   );
 };
 
-const WatchedFields = ({ formMethods }: { formMethods: FormMethods }) => {
-  const [fieldNames, setFieldNames] = useState<Array<string>>([]);
+const ValuesSection = ({ values }: { values: unknown }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  return (
+    <div style={{ marginBottom: "12px" }}>
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          margin: "0 0 8px 0",
+          fontSize: "13px",
+          fontWeight: "600",
+          background: "none",
+          border: "none",
+          color: "inherit",
+          cursor: "pointer",
+          padding: "0",
+        }}
+      >
+        {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        <span>Values</span>
+      </button>
+      {isExpanded && (
+        <pre
+          style={{
+            margin: 0,
+            padding: "8px",
+            background: "#1a1a1a",
+            borderRadius: "4px",
+            overflow: "auto",
+            maxHeight: "200px",
+          }}
+        >
+          {JSON.stringify(values, null, 2)}
+        </pre>
+      )}
+    </div>
+  );
+};
+
+const WatchedFields = () => {
+  const [watchedFields, setWatchedFields] = useState<
+    Array<{ id: string; name: string }>
+  >([{ id: crypto.randomUUID(), name: "" }]);
+
+  const addField = () => {
+    setWatchedFields((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), name: "" },
+    ]);
+  };
+
+  const removeField = (id: string) => {
+    setWatchedFields((prev) => {
+      if (prev.length === 1) {
+        return [{ id: crypto.randomUUID(), name: "" }];
+      }
+      return prev.filter((field) => field.id !== id);
+    });
+  };
+
+  const updateFieldName = (id: string, name: string) => {
+    setWatchedFields((prev) =>
+      prev.map((field) => (field.id === id ? { ...field, name } : field))
+    );
+  };
+
+  return (
+    <div style={{ marginTop: "12px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        {watchedFields.map((field) => (
+          <WatchedFieldRow
+            key={field.id}
+            fieldName={field.name}
+            onRemove={() => removeField(field.id)}
+            onNameChange={(name) => updateFieldName(field.id, name)}
+          />
+        ))}
+      </div>
+
+      <Button
+        onClick={addField}
+        size="sm"
+        variant="outline"
+        style={{
+          marginTop: "8px",
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "4px",
+        }}
+      >
+        <Plus size={14} />
+        <span>Add Field</span>
+      </Button>
+    </div>
+  );
+};
+
+const WatchedFieldRow = ({
+  fieldName,
+  onRemove,
+  onNameChange,
+}: {
+  fieldName: string;
+  onRemove: () => void;
+  onNameChange: (name: string) => void;
+}) => {
+  const { control } = useFormContext();
+  const value = useWatch({ control, name: fieldName });
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: "8px",
+        padding: "8px 12px",
+        background: "#1a1a1a",
+        borderRadius: "6px",
+        border: "1px solid #374151",
+      }}
+    >
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <input
+          type="text"
+          value={fieldName}
+          onChange={(e) => onNameChange(e.target.value)}
+          placeholder="Enter CASE SENSITIVE field name (e.g. username)"
+          style={{
+            width: "100%",
+            border: "1px solid #4b5563",
+            borderRadius: "4px",
+            padding: "4px 8px",
+            background: "#0a0a0a",
+            color: "#fff",
+            fontSize: "11px",
+            outline: "none",
+            marginBottom: "6px",
+          }}
+        />
+        {fieldName && (
+          <div
+            style={{
+              fontSize: "12px",
+              color: "#fff",
+              wordBreak: "break-all",
+            }}
+          >
+            {typeof value === "object" ? (
+              <pre
+                style={{
+                  margin: 0,
+                  fontFamily: "monospace",
+                  fontSize: "11px",
+                  color: "#10b981",
+                }}
+              >
+                {JSON.stringify(value, null, 2)}
+              </pre>
+            ) : (
+              <span style={{ color: "#10b981" }}>
+                {value === undefined
+                  ? "undefined"
+                  : value === null
+                  ? "null"
+                  : String(value)}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+      <button
+        onClick={onRemove}
+        style={{
+          background: "none",
+          border: "none",
+          color: "#6b7280",
+          cursor: "pointer",
+          padding: "0",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "color 0.2s",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.color = "#ef4444")}
+        onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}
+      >
+        <X size={14} />
+      </button>
+    </div>
+  );
+};
+
+const GetValuesOnDemand = () => {
+  const { getValues, getFieldState } = useFormContext();
+  const [inputValue, setInputValue] = useState<string>("");
+  const [gottenValue, setGottenValue] = useState<unknown>(null);
+  const [fieldState, setFieldState] = useState<ReturnType<
+    typeof getFieldState
+  > | null>(null);
+
+  const handleGetValues = (field?: string) => {
+    setGottenValue(field ? getValues(field) : getValues());
+  };
+
+  const handleGetFieldState = (field?: string) => {
+    setFieldState(field ? getFieldState(field) : null);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGottenValue(null);
+    setFieldState(null);
+    return setInputValue(e.target.value);
+  };
+
+  const fieldStateWithSerializableError = fieldState
+    ? {
+        ...fieldState,
+        error: fieldState.error
+          ? {
+              message: fieldState.error.message,
+              type: fieldState.error.type,
+            }
+          : null,
+      }
+    : null;
 
   return (
     <div>
-      <h4 style={{ margin: "0 0 8px 0", fontSize: "13px" }}>Watched Fields</h4>
+      <input type="text" value={inputValue} onChange={handleInputChange} />
+      <button onClick={() => handleGetValues(inputValue)}>Get Values</button>
+      <button onClick={() => handleGetFieldState(inputValue)}>
+        Get Field State
+      </button>
+      {Boolean(gottenValue) && (
+        <div>
+          <pre>{JSON.stringify(gottenValue, null, 2)}</pre>
+        </div>
+      )}
+      {Boolean(fieldState) && (
+        <div>
+          <pre>{JSON.stringify(fieldStateWithSerializableError, null, 2)}</pre>
+        </div>
+      )}
     </div>
   );
 };

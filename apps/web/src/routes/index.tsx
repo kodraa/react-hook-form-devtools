@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -30,15 +32,33 @@ type FormData = {
   username: string;
   email: string;
   password: string;
+  age: number;
+  doubleAge: number;
 };
 
+const schema = z.object({
+  username: z.string().min(3),
+  email: z.string().email(),
+  password: z.string().min(8),
+  age: z.number(),
+  doubleAge: z.number(),
+  things: z.array(
+    z.object({
+      thingName: z.string(),
+    })
+  ),
+});
+
+type Values = z.infer<typeof schema>;
+
 function HomeComponent() {
-  const form = useForm<FormData>({
+  const form = useForm<Values>({
     defaultValues: {
       username: "",
       email: "",
       password: "",
     },
+    resolver: zodResolver(schema),
     mode: "onChange",
   });
 

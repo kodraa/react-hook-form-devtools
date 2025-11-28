@@ -9,49 +9,12 @@ import { DevtoolsEventClient } from "./eventClient";
  */
 export function useRHFDevtools(form: UseFormReturn<any>, formId: string) {
   useEffect(() => {
-    // Register form methods in the store (bypasses event serialization)
-    DevtoolsEventClient.registerFormMethods(formId, form);
-
-    // Subscribe to form state changes
-    const subscription = form.subscribe({
-      formState: {
-        errors: true,
-        isDirty: true,
-        isValid: true,
-        touchedFields: true,
-        dirtyFields: true,
-        values: true,
-      },
-      callback: () => {
-        const {
-          formState: {
-            errors,
-            isDirty,
-            isValid,
-            isSubmitting,
-            touchedFields,
-            dirtyFields,
-          },
-        } = form;
-
-        // Emit the current form state to the devtools
-        DevtoolsEventClient.emit("form-state", {
-          formId,
-          values: form.getValues(),
-          errors,
-          isDirty,
-          isValid,
-          isSubmitting,
-          touchedFields,
-          dirtyFields,
-        });
-      },
-    });
+    // Register form - stores formMethods and emits registration event
+    DevtoolsEventClient.registerForm(formId, form);
 
     return () => {
-      subscription();
-      // Unregister form methods when component unmounts
-      DevtoolsEventClient.unregisterFormMethods(formId);
+      // Unregister form when component unmounts
+      DevtoolsEventClient.unregisterForm(formId);
     };
   }, [form, formId]);
 }

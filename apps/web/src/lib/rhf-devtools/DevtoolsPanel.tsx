@@ -1,65 +1,64 @@
 import { useEffect, useState } from "react";
-import { DevtoolsEventClient, type FormState } from "./eventClient";
+import { DevtoolsEventClient } from "./eventClient";
 
 export default function RHFDevtoolsPanel() {
-  const [forms, setForms] = useState<FormState[]>([]);
+  const [formIds, setFormIds] = useState<string[]>([]);
   const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
 
-  console.log("forms", forms);
   useEffect(() => {
-    // Subscribe to individual form state updates
-    const cleanupFormState = DevtoolsEventClient.on("form-state", (e) => {
-      console.log("on form state", e);
-      setForms((prev) => {
-        console.log("setting forms");
-        const existing = prev.find((f) => f.formId === e.payload.formId);
-        console.log({
-          existing,
-          payload: e.payload,
-        });
-        if (existing) {
-          return prev.map((f) =>
-            f.formId === e.payload.formId ? e.payload : f
-          );
+    // Initialize with already registered forms
+    setFormIds(DevtoolsEventClient.getRegisteredFormIds());
+
+    // Subscribe to form registration events
+    const cleanupRegister = DevtoolsEventClient.on("register-form", (e) => {
+      setFormIds((prev) => {
+        if (!prev.includes(e.payload.formId)) {
+          return [...prev, e.payload.formId];
         }
-        console.log({
-          prev,
-          e,
-          payload: e.payload,
-        });
-        return [...prev, e.payload];
+        return prev;
       });
     });
 
-    // Subscribe to forms list updates
-    const cleanupFormsList = DevtoolsEventClient.on("forms-list", (e) => {
-      setForms(e.payload.forms);
+    // Subscribe to form unregistration events
+    const cleanupUnregister = DevtoolsEventClient.on("unregister-form", (e) => {
+      setFormIds((prev) => prev.filter((id) => id !== e.payload.formId));
     });
 
     return () => {
-      cleanupFormState();
-      cleanupFormsList();
+      cleanupRegister();
+      cleanupUnregister();
     };
   }, []);
 
-  const selectedForm = forms.find((f) => f.formId === selectedFormId);
-
-  // Access form methods using the store (not from events)
-  // You can use this to call methods like: setValue, reset, trigger, etc.
-  const selectedFormMethods = selectedFormId
+  // Get form methods from the store
+  const formMethods = selectedFormId
     ? DevtoolsEventClient.getFormMethods(selectedFormId)
     : undefined;
 
-  // Example: Log form methods when available (can be used for debugging or actions)
+  // Get form state directly from form methods
+  const formState = formMethods
+    ? {
+        values: formMethods.getValues(),
+        errors: formMethods.formState.errors,
+        isDirty: formMethods.formState.isDirty,
+        isValid: formMethods.formState.isValid,
+        isSubmitting: formMethods.formState.isSubmitting,
+        touchedFields: formMethods.formState.touchedFields,
+        dirtyFields: formMethods.formState.dirtyFields,
+      }
+    : null;
+
+  // Subscribe to form state changes for re-rendering
   useEffect(() => {
-    if (selectedFormMethods) {
-      console.log(
-        "Form methods available for:",
-        selectedFormId,
-        selectedFormMethods
-      );
-    }
-  }, [selectedFormId, selectedFormMethods]);
+    if (!formMethods) return;
+
+    const subscription = formMethods.watch(() => {
+      // Force re-render when form state changes
+      setFormIds((prev) => [...prev]);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [formMethods]);
 
   return (
     <div style={{ padding: "16px", fontFamily: "monospace", fontSize: "12px" }}>
@@ -69,17 +68,17 @@ export default function RHFDevtoolsPanel() {
         React Hook Form DevTools
       </h3>
 
-      {forms.length === 0 ? (
+      {formIds.length === 0 ? (
         <div style={{ color: "#888" }}>No forms registered yet...</div>
       ) : (
         <>
           <SelectForm
-            forms={forms}
+            formIds={formIds}
             selectedFormId={selectedFormId}
             setSelectedFormId={setSelectedFormId}
           />
 
-          {selectedForm && (
+          {formState && (
             <div>
               <div style={{ marginBottom: "12px" }}>
                 <div
@@ -91,9 +90,15 @@ export default function RHFDevtoolsPanel() {
                   }}
                 >
                   <h4 style={{ margin: "0", fontSize: "13px" }}>Form State</h4>
-                  {selectedFormMethods && (
+                  {formMethods && (
                     <button
-                      onClick={() => selectedFormMethods.reset()}
+                      onClick={() =>
+                        formMethods.reset({
+                          options: {
+                            keepDefaultValues: true,
+                          },
+                        })
+                      }
                       style={{
                         padding: "4px 8px",
                         fontSize: "11px",
@@ -113,30 +118,30 @@ export default function RHFDevtoolsPanel() {
                     style={{
                       padding: "2px 6px",
                       borderRadius: "4px",
-                      background: selectedForm.isDirty ? "#f59e0b" : "#374151",
+                      background: formState.isDirty ? "#f59e0b" : "#374151",
                     }}
                   >
-                    {selectedForm.isDirty ? "Dirty" : "Pristine"}
+                    {formState.isDirty ? "Dirty" : "Pristine"}
                   </span>
                   <span
                     style={{
                       padding: "2px 6px",
                       borderRadius: "4px",
-                      background: selectedForm.isValid ? "#10b981" : "#ef4444",
+                      background: formState.isValid ? "#10b981" : "#ef4444",
                     }}
                   >
-                    {selectedForm.isValid ? "Valid" : "Invalid"}
+                    {formState.isValid ? "Valid" : "Invalid"}
                   </span>
                   <span
                     style={{
                       padding: "2px 6px",
                       borderRadius: "4px",
-                      background: selectedForm.isSubmitting
+                      background: formState.isSubmitting
                         ? "#3b82f6"
                         : "#374151",
                     }}
                   >
-                    {selectedForm.isSubmitting ? "Submitting" : "Ready"}
+                    {formState.isSubmitting ? "Submitting" : "Ready"}
                   </span>
                 </div>
               </div>
@@ -155,37 +160,11 @@ export default function RHFDevtoolsPanel() {
                     maxHeight: "200px",
                   }}
                 >
-                  {JSON.stringify(selectedForm.values, null, 2)}
+                  {JSON.stringify(formState.values, null, 2)}
                 </pre>
               </div>
 
-              {Object.keys(selectedForm.errors).length > 0 && (
-                <div style={{ marginBottom: "12px" }}>
-                  <h4
-                    style={{
-                      margin: "0 0 8px 0",
-                      fontSize: "13px",
-                      color: "#ef4444",
-                    }}
-                  >
-                    Errors
-                  </h4>
-                  <pre
-                    style={{
-                      margin: 0,
-                      padding: "8px",
-                      background: "#1a1a1a",
-                      borderRadius: "4px",
-                      overflow: "auto",
-                      maxHeight: "200px",
-                    }}
-                  >
-                    {JSON.stringify(selectedForm.errors, null, 2)}
-                  </pre>
-                </div>
-              )}
-
-              {Object.keys(selectedForm.touchedFields).length > 0 && (
+              {Object.keys(formState.touchedFields).length > 0 && (
                 <div style={{ marginBottom: "12px" }}>
                   <h4 style={{ margin: "0 0 8px 0", fontSize: "13px" }}>
                     Touched Fields
@@ -193,7 +172,7 @@ export default function RHFDevtoolsPanel() {
                   <div
                     style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}
                   >
-                    {Object.keys(selectedForm.touchedFields).map((field) => (
+                    {Object.keys(formState.touchedFields).map((field) => (
                       <span
                         key={field}
                         style={{
@@ -209,7 +188,7 @@ export default function RHFDevtoolsPanel() {
                 </div>
               )}
 
-              {Object.keys(selectedForm.dirtyFields).length > 0 && (
+              {Object.keys(formState.dirtyFields).length > 0 && (
                 <div>
                   <h4 style={{ margin: "0 0 8px 0", fontSize: "13px" }}>
                     Dirty Fields
@@ -217,7 +196,7 @@ export default function RHFDevtoolsPanel() {
                   <div
                     style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}
                   >
-                    {Object.keys(selectedForm.dirtyFields).map((field) => (
+                    {Object.keys(formState.dirtyFields).map((field) => (
                       <span
                         key={field}
                         style={{
@@ -241,19 +220,19 @@ export default function RHFDevtoolsPanel() {
 }
 
 const SelectForm = ({
-  forms,
+  formIds,
   selectedFormId,
   setSelectedFormId,
 }: {
-  forms: FormState[];
+  formIds: string[];
   selectedFormId: string | null;
   setSelectedFormId: (formId: string) => void;
 }) => {
   useEffect(() => {
-    if (forms.length === 1) {
-      setSelectedFormId(forms[0].formId);
+    if (formIds.length === 1) {
+      setSelectedFormId(formIds[0]);
     }
-  }, [forms, setSelectedFormId]);
+  }, [formIds, setSelectedFormId]);
 
   return (
     <div style={{ marginBottom: "16px" }}>
@@ -273,9 +252,9 @@ const SelectForm = ({
         }}
       >
         <option value="">Select a form...</option>
-        {forms.map((form) => (
-          <option key={form.formId} value={form.formId}>
-            {form.formId}
+        {formIds.map((formId) => (
+          <option key={formId} value={formId}>
+            {formId}
           </option>
         ))}
       </select>

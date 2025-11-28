@@ -3,25 +3,19 @@ import type { UseFormReturn } from "react-hook-form";
 
 export type FormState = {
   formId: string;
-  values: Record<string, any>;
-  errors: Record<string, any>;
-  isDirty: boolean;
-  isValid: boolean;
-  isSubmitting: boolean;
-  touchedFields: Record<string, boolean>;
-  dirtyFields: Record<string, boolean>;
+  formMethods: UseFormReturn;
 };
 
 type EventMap = {
   // The key of the event map is a combination of {pluginId}:{eventSuffix}
   // The value is the expected type of the event payload
-  "rhf-devtools:form-state": FormState;
-  "rhf-devtools:forms-list": { forms: FormState[] };
+  "rhf-devtools:register-form": { formId: string };
+  "rhf-devtools:unregister-form": { formId: string };
 };
 
 class RHFDevtoolsEventClient extends EventClient<EventMap> {
-  // Store for formMethods that can't be serialized through events
-  private formMethodsStore: Map<string, UseFormReturn> = new Map();
+  // Store for formMethods - mapping formId to form methods
+  private formsStore: Map<string, UseFormReturn> = new Map();
 
   constructor() {
     super({
@@ -32,39 +26,45 @@ class RHFDevtoolsEventClient extends EventClient<EventMap> {
   }
 
   /**
-   * Register form methods for a given formId
-   * This bypasses the event system to avoid serialization issues
+   * Register a form and emit registration event
    */
-  registerFormMethods(formId: string, formMethods: UseFormReturn) {
-    this.formMethodsStore.set(formId, formMethods);
+  registerForm(formId: string, formMethods: UseFormReturn) {
+    this.formsStore.set(formId, formMethods);
+    this.emit("register-form", { formId });
   }
 
   /**
-   * Retrieve form methods for a given formId
+   * Unregister a form and emit unregistration event
+   */
+  unregisterForm(formId: string) {
+    this.formsStore.delete(formId);
+    this.emit("unregister-form", { formId });
+  }
+
+  /**
+   * Get form methods for a specific form
    */
   getFormMethods(formId: string): UseFormReturn | undefined {
-    return this.formMethodsStore.get(formId);
+    return this.formsStore.get(formId);
   }
 
   /**
-   * Unregister form methods when a form is unmounted
+   * Get all registered forms (formId + formMethods)
    */
-  unregisterFormMethods(formId: string) {
-    this.formMethodsStore.delete(formId);
+  getAllForms(): FormState[] {
+    return Array.from(this.formsStore.entries()).map(
+      ([formId, formMethods]) => ({
+        formId,
+        formMethods,
+      })
+    );
   }
 
   /**
    * Get all registered form IDs
    */
   getRegisteredFormIds(): string[] {
-    return Array.from(this.formMethodsStore.keys());
-  }
-
-  /**
-   * Check if a form is registered
-   */
-  hasFormMethods(formId: string): boolean {
-    return this.formMethodsStore.has(formId);
+    return Array.from(this.formsStore.keys());
   }
 }
 

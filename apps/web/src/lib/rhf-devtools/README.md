@@ -83,70 +83,83 @@ React component that renders the devtools panel UI.
 
 ### `DevtoolsEventClient`
 
-Event client for manual integration or custom functionality.
+Event client for managing form registration and accessing form methods.
 
 **Methods:**
 
-- `emit(event, payload)` - Emit an event to the devtools
-- `on(event, handler)` - Subscribe to devtools events
-- `registerFormMethods(formId, formMethods)` - Register form methods for a form (automatically called by `useRHFDevtools`)
-- `getFormMethods(formId)` - Retrieve form methods for a given form ID
-- `unregisterFormMethods(formId)` - Unregister form methods when a form is unmounted
+- `registerForm(formId, formMethods)` - Register a form and emit registration event (automatically called by `useRHFDevtools`)
+- `unregisterForm(formId)` - Unregister a form and emit unregistration event
+- `getFormMethods(formId)` - Get form methods for a specific form
+- `getAllForms()` - Get all registered forms (returns `FormState[]`)
 - `getRegisteredFormIds()` - Get all registered form IDs
-- `hasFormMethods(formId)` - Check if a form is registered
+- `on(event, handler)` - Subscribe to devtools events (`register-form`, `unregister-form`)
+- `emit(event, payload)` - Emit an event to the devtools
 
 **Accessing Form Methods:**
 
-Form methods (like `setValue`, `reset`, `trigger`, etc.) cannot be serialized through the event system. Instead, they're stored in a separate store and can be accessed directly:
+Form methods are stored directly in the client (not serialized through events) and can be accessed anytime:
 
 ```tsx
 import { DevtoolsEventClient } from "@/lib/rhf-devtools";
 
-// In your DevTools panel or any component
+// Get form methods for any registered form
 const formMethods = DevtoolsEventClient.getFormMethods("my-form-id");
 
 if (formMethods) {
-  // Now you can call any form method
+  // Access all React Hook Form methods
   formMethods.reset(); // Reset the form
   formMethods.setValue("fieldName", "newValue"); // Set a field value
   formMethods.trigger(); // Trigger validation
+
+  // Access form state directly
+  const values = formMethods.getValues();
+  const errors = formMethods.formState.errors;
 }
 ```
+
+**Events:**
+
+- `register-form` - Emitted when a form is registered (payload: `{ formId: string }`)
+- `unregister-form` - Emitted when a form is unregistered (payload: `{ formId: string }`)
 
 ## Extension Points
 
 The devtools architecture is designed to be extensible. Here are some ways you can extend it:
 
-### 1. Add Custom Events
+### 1. Listen to Registration Events
 
-Extend the `EventMap` type in `eventClient.ts`:
-
-```typescript
-type EventMap = {
-  "rhf-devtools:form-state": FormState;
-  "rhf-devtools:forms-list": { forms: FormState[] };
-  "rhf-devtools:custom-event": { data: any }; // Add your custom event
-};
-```
-
-### 2. Add Form Actions
-
-You can emit events from your forms to trigger actions in the devtools:
+Subscribe to form registration/unregistration events:
 
 ```typescript
 import { DevtoolsEventClient } from "@/lib/rhf-devtools";
 
-// Emit custom events
-DevtoolsEventClient.emit("custom-event", { data: "my data" });
+// Listen for when forms are registered
+DevtoolsEventClient.on("register-form", (event) => {
+  console.log("Form registered:", event.payload.formId);
+  const formMethods = DevtoolsEventClient.getFormMethods(event.payload.formId);
+});
+
+// Listen for when forms are unregistered
+DevtoolsEventClient.on("unregister-form", (event) => {
+  console.log("Form unregistered:", event.payload.formId);
+});
 ```
 
-### 3. Extend the Panel UI
+### 2. Add Custom Events
 
-Modify `DevtoolsPanel.tsx` to add additional UI elements, tabs, or visualizations.
+Extend the `EventMap` type in `eventClient.ts` to add your own events:
 
-### 4. Add Interactive Actions
+```typescript
+type EventMap = {
+  "rhf-devtools:register-form": { formId: string };
+  "rhf-devtools:unregister-form": { formId: string };
+  "rhf-devtools:custom-event": { data: any }; // Add your custom event
+};
+```
 
-You can add buttons or controls in the DevTools panel that interact with forms:
+### 3. Add Interactive Actions
+
+You can add buttons or controls in the DevTools panel that interact with forms using the stored form methods:
 
 ```tsx
 // In your DevtoolsPanel component
@@ -158,15 +171,38 @@ const formMethods = DevtoolsEventClient.getFormMethods(selectedFormId);
 <button onClick={() => formMethods?.setValue("fieldName", "value")}>
   Set Field Value
 </button>
+<button onClick={() => {
+  const values = formMethods?.getValues();
+  console.log("Current values:", values);
+}}>
+  Log Values
+</button>
 ```
+
+### 4. Extend the Panel UI
+
+Modify `DevtoolsPanel.tsx` to add additional UI elements, tabs, or visualizations. The panel has direct access to all form methods through `DevtoolsEventClient.getFormMethods(formId)`.
 
 ## Architecture
 
-The devtools follows the TanStack DevTools plugin pattern:
+The devtools uses a simplified architecture that combines TanStack's event system with direct form method access:
 
-1. **Event Client** (`eventClient.ts`): Manages communication between forms and the devtools panel
-2. **DevTools Hook** (`useRHFDevtools.ts`): Watches form state and emits updates to the event client
-3. **DevTools Panel** (`DevtoolsPanel.tsx`): UI component that displays form state
+1. **Event Client** (`eventClient.ts`):
+
+   - Stores form methods in a Map (bypassing serialization issues)
+   - Uses TanStack's event bus only for registration/unregistration notifications
+   - Provides direct access to form methods via `getFormMethods()`
+
+2. **DevTools Hook** (`useRHFDevtools.ts`):
+
+   - Registers forms with the event client on mount
+   - Unregisters forms on unmount
+   - Simple and lightweight
+
+3. **DevTools Panel** (`DevtoolsPanel.tsx`):
+   - Listens to `register-form` and `unregister-form` events to track available forms
+   - Accesses form state directly through `getFormMethods()`
+   - Subscribes to form changes using React Hook Form's `watch()` for reactivity
 
 ## Future Extensions
 

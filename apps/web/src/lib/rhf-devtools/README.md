@@ -90,7 +90,7 @@ Event client for managing form registration and accessing form methods.
 - `registerForm(formId, formMethods)` - Register a form and emit registration event (automatically called by `useRHFDevtools`)
 - `unregisterForm(formId)` - Unregister a form and emit unregistration event
 - `getFormMethods(formId)` - Get form methods for a specific form
-- `getAllForms()` - Get all registered forms (returns `FormState[]`)
+- `getAllForms()` - Get all registered forms (returns `Array<FormState>`)
 - `getRegisteredFormIds()` - Get all registered form IDs
 - `on(event, handler)` - Subscribe to devtools events (`register-form`, `unregister-form`)
 - `emit(event, payload)` - Emit an event to the devtools

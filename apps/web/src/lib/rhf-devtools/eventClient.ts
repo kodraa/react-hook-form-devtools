@@ -51,7 +51,7 @@ class RHFDevtoolsEventClient extends EventClient<EventMap> {
   /**
    * Get all registered forms (formId + formMethods)
    */
-  getAllForms(): FormState[] {
+  getAllForms(): Array<FormState> {
     return Array.from(this.formsStore.entries()).map(
       ([formId, formMethods]) => ({
         formId,

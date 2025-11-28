@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { DevtoolsEventClient } from "./eventClient";
 
 export default function RHFDevtoolsPanel() {
-  const [formIds, setFormIds] = useState<string[]>([]);
+  const [formIds, setFormIds] = useState<Array<string>>([]);
   const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -132,17 +132,17 @@ export default function RHFDevtoolsPanel() {
                   >
                     {formState.isValid ? "Valid" : "Invalid"}
                   </span>
-                  <span
-                    style={{
-                      padding: "2px 6px",
-                      borderRadius: "4px",
-                      background: formState.isSubmitting
-                        ? "#3b82f6"
-                        : "#374151",
-                    }}
-                  >
-                    {formState.isSubmitting ? "Submitting" : "Ready"}
-                  </span>
+                  {formState.isSubmitting && (
+                    <span
+                      style={{
+                        padding: "2px 6px",
+                        borderRadius: "4px",
+                        background: "#3b82f6",
+                      }}
+                    >
+                      Submitting
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -202,7 +202,7 @@ export default function RHFDevtoolsPanel() {
                         style={{
                           padding: "2px 6px",
                           borderRadius: "4px",
-                          background: "#f59e0b",
+                          background: "#374151",
                         }}
                       >
                         {field}
@@ -224,7 +224,7 @@ const SelectForm = ({
   selectedFormId,
   setSelectedFormId,
 }: {
-  formIds: string[];
+  formIds: Array<string>;
   selectedFormId: string | null;
   setSelectedFormId: (formId: string) => void;
 }) => {
@@ -258,6 +258,16 @@ const SelectForm = ({
           </option>
         ))}
       </select>
+    </div>
+  );
+};
+
+const WatchedFields = ({ formMethods }: { formMethods: FormMethods }) => {
+  const [fieldNames, setFieldNames] = useState<Array<string>>([]);
+
+  return (
+    <div>
+      <h4 style={{ margin: "0 0 8px 0", fontSize: "13px" }}>Watched Fields</h4>
     </div>
   );
 };

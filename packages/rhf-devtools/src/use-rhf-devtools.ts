@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { type UseFormReturn } from "react-hook-form";
-import { DevtoolsEventClient } from "./eventClient";
+import { DevtoolsEventClient } from "./event-client";
 
 /**
  * Hook to register a React Hook Form instance with the devtools

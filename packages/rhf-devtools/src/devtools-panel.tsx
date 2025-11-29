@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DevtoolsEventClient } from "./eventClient";
+import { DevtoolsEventClient } from "./event-client";
 import { useFormContext, useWatch, FormProvider } from "react-hook-form";
 
 // Icon components

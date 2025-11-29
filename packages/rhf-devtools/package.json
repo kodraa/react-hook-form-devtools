@@ -1,0 +1,61 @@
+{
+  "name": "react-hook-form-devtools",
+  "version": "1.0.0",
+  "description": "A minimal devtools implementation for React Hook Form built using TanStack DevTools",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepublishOnly": "bun run build"
+  },
+  "keywords": [
+    "react",
+    "react-hook-form",
+    "devtools",
+    "tanstack",
+    "debugging",
+    "forms",
+    "validation"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/react-hook-form-devtools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/react-hook-form-devtools/issues"
+  },
+  "homepage": "https://github.com/yourusername/react-hook-form-devtools#readme",
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "react-hook-form": "^7.0.0"
+  },
+  "dependencies": {
+    "@tanstack/devtools-event-client": "^0.3.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-hook-form": "^7.66.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  }
+}

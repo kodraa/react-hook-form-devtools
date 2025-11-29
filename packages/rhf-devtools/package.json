@@ -34,12 +34,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/react-hook-form-devtools.git"
+    "url": "https://github.com/kodraa/react-hook-form-devtools.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/react-hook-form-devtools/issues"
+    "url": "https://github.com/kodraa/react-hook-form-devtools/issues"
   },
-  "homepage": "https://github.com/yourusername/react-hook-form-devtools#readme",
+  "homepage": "https://github.com/kodraa/react-hook-form-devtools#readme",
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",

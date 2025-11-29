@@ -1,5 +1,5 @@
 {
-  "name": "react-hook-form-devtools",
+  "name": "@nourkodra/react-hook-form-devtools",
   "version": "1.0.0",
   "description": "A minimal devtools implementation for React Hook Form built using TanStack DevTools",
   "main": "./dist/index.js",

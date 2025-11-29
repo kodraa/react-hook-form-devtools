@@ -568,7 +568,10 @@ const WatchedFieldRow = ({
   onNameChange: (name: string) => void;
 }) => {
   const { control } = useFormContext();
-  const value = useWatch({ control, name: fieldName });
+  const value = useWatch({
+    control,
+    name: fieldName === "--" ? undefined : fieldName,
+  });
 
   return (
     <div
@@ -587,7 +590,7 @@ const WatchedFieldRow = ({
           type="text"
           value={fieldName}
           onChange={(e) => onNameChange(e.target.value)}
-          placeholder="Enter CASE SENSITIVE field name (e.g. username)"
+          placeholder="Enter CASE SENSITIVE field name (e.g. username) or Enter -- to watch all values"
           style={{
             width: "100%",
             border: "1px solid #4b5563",

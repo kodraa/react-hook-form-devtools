@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { type UseFormReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { DevtoolsEventClient } from "./event-client";
 
 /**
@@ -7,14 +7,18 @@ import { DevtoolsEventClient } from "./event-client";
  * @param form - The form instance from useForm()
  * @param formId - A unique identifier for the form
  */
-export function useRHFDevtools(form: UseFormReturn<any>, formId: string) {
+export function RHFDevtools({ formId }: { formId: string }) {
+  const formMethods = useFormContext();
+
   useEffect(() => {
     // Register form - stores formMethods and emits registration event
-    DevtoolsEventClient.registerForm(formId, form);
+    DevtoolsEventClient.registerForm(formId, formMethods);
 
     return () => {
       // Unregister form when component unmounts
       DevtoolsEventClient.unregisterForm(formId);
     };
-  }, [form, formId]);
+  }, [formMethods, formId]);
+
+  return null;
 }

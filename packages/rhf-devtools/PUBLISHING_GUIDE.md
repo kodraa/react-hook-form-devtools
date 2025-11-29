@@ -143,7 +143,7 @@ npm install @yourusername/react-hook-form-devtools
 And use it:
 
 ```tsx
-import { RHFDevtoolsPanel, useRHFDevtools } from "your-package-name";
+import { RHFDevtoolsPanel, RHFDevtools } from "your-package-name";
 ```
 
 ## Troubleshooting

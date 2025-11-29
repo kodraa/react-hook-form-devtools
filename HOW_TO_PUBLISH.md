@@ -127,7 +127,7 @@ npm install your-package-name
 ### Use Your Package
 
 ```tsx
-import { RHFDevtoolsPanel, useRHFDevtools } from "your-package-name";
+import { RHFDevtoolsPanel, RHFDevtools } from "your-package-name";
 ```
 
 ## 🔄 Publishing Updates

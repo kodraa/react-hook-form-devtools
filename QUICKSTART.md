@@ -41,10 +41,10 @@ As you type, watch the DevTools panel update in real-time!
 
 ## How to Use in Your Own Forms
 
-### Step 1: Import the Hook
+### Step 1: Import the Component
 
 ```tsx
-import { useRHFDevtools } from '@/lib/rhf-devtools'
+import { RHFDevtools } from '@/lib/rhf-devtools'
 ```
 
 ### Step 2: Register Your Form
@@ -58,13 +58,13 @@ function MyForm() {
     },
   })
 
-  // Add this line to register with devtools
-  useRHFDevtools(form, 'my-unique-form-id')
-
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>
-      {/* Your form fields */}
-    </form>
+    <FormProvider {...form}>
+      <RHFDevtools formId="my-unique-form-id" />
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        {/* Your form fields */}
+      </form>
+    </FormProvider>
   )
 }
 ```
@@ -76,8 +76,8 @@ That's it! Your form will now appear in the DevTools panel.
 ```
 apps/web/src/lib/rhf-devtools/
 ├── eventClient.ts        # Event bus for communication
-├── DevtoolsPanel.tsx     # The UI panel component
-├── useRHFDevtools.ts     # Hook to register forms
+├── devtools-panel.tsx    # The UI panel component
+├── rhf-devtools.ts       # Component to register forms
 ├── index.ts              # Exports
 └── README.md             # Detailed documentation
 ```
@@ -118,8 +118,8 @@ The architecture is built to be extensible. See `DEVTOOLS_IMPLEMENTATION.md` for
 ## Files Created
 
 - `apps/web/src/lib/rhf-devtools/eventClient.ts`
-- `apps/web/src/lib/rhf-devtools/DevtoolsPanel.tsx`
-- `apps/web/src/lib/rhf-devtools/useRHFDevtools.ts`
+- `apps/web/src/lib/rhf-devtools/devtools-panel.tsx`
+- `apps/web/src/lib/rhf-devtools/rhf-devtools.ts`
 - `apps/web/src/lib/rhf-devtools/index.ts`
 - `apps/web/src/lib/rhf-devtools/README.md`
 
@@ -132,8 +132,8 @@ bun add @tanstack/devtools-event-client @tanstack/react-devtools
 ## Next Steps
 
 1. **Try the demo** - Interact with the form and watch the devtools
-2. **Register your own forms** - Add `useRHFDevtools` to your forms
-3. **Customize the panel** - Modify `DevtoolsPanel.tsx` to add features
+2. **Register your own forms** - Add `RHFDevtools` component to your forms
+3. **Customize the panel** - Modify `devtools-panel.tsx` to add features
 4. **Extend functionality** - See the README for extension ideas
 
 ## Troubleshooting
@@ -142,11 +142,11 @@ bun add @tanstack/devtools-event-client @tanstack/react-devtools
 
 - Make sure you're running in development mode
 - Check that `TanStackDevtools` is rendered in your root component
-- Ensure you've called `useRHFDevtools` in your form component
+- Ensure you've added `RHFDevtools` component inside your form
 
 ### Form Not Appearing in DevTools
 
-- Verify you've called `useRHFDevtools(form, 'unique-id')` in your form component
+- Verify you've added `<RHFDevtools formId="unique-id" />` inside your form component
 - Make sure the form ID is unique
 - Check browser console for any errors
 

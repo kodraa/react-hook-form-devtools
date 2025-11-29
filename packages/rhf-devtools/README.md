@@ -61,8 +61,8 @@ function App() {
 ### 2. Register Forms with DevTools
 
 ```tsx
-import { useForm } from "react-hook-form";
-import { useRHFDevtools } from "react-hook-form-devtools";
+import { useForm, FormProvider } from "react-hook-form";
+import { RHFDevtools } from "react-hook-form-devtools";
 
 function MyForm() {
   const form = useForm({
@@ -72,31 +72,39 @@ function MyForm() {
     },
   });
 
-  // Register this form with the devtools
-  useRHFDevtools(form, "my-form-id");
-
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>{/* Your form fields */}</form>
+    <FormProvider {...form}>
+      <RHFDevtools formId="my-form-id" />
+      <form onSubmit={form.handleSubmit(onSubmit)}>{/* Your form fields */}</form>
+    </FormProvider>
   );
 }
 ```
 
 ## API
 
-### `useRHFDevtools(form, formId)`
+### `RHFDevtools`
 
-Hook to register a React Hook Form instance with the devtools.
+Component to register a React Hook Form instance with the devtools.
 
-**Parameters:**
+**Props:**
 
-- `form` - The form instance from `useForm()`
 - `formId` - A unique identifier for the form (string)
 
 **Example:**
 
 ```tsx
+import { FormProvider } from "react-hook-form";
+import { RHFDevtools } from "react-hook-form-devtools";
+
 const form = useForm();
-useRHFDevtools(form, "registration-form");
+
+return (
+  <FormProvider {...form}>
+    <RHFDevtools formId="registration-form" />
+    {/* Your form content */}
+  </FormProvider>
+);
 ```
 
 ### `RHFDevtoolsPanel`
@@ -109,7 +117,7 @@ Event client for managing form registration and accessing form methods.
 
 **Methods:**
 
-- `registerForm(formId, formMethods)` - Register a form and emit registration event (automatically called by `useRHFDevtools`)
+- `registerForm(formId, formMethods)` - Register a form and emit registration event (automatically called by `RHFDevtools`)
 - `unregisterForm(formId)` - Unregister a form and emit unregistration event
 - `getFormMethods(formId)` - Get form methods for a specific form
 - `getAllForms()` - Get all registered forms (returns `Array<FormState>`)
@@ -215,7 +223,7 @@ The devtools uses a simplified architecture that combines TanStack's event syste
    - Uses TanStack's event bus only for registration/unregistration notifications
    - Provides direct access to form methods via `getFormMethods()`
 
-2. **DevTools Hook** (`useRHFDevtools.ts`):
+2. **DevTools Component** (`rhf-devtools.ts`):
 
    - Registers forms with the event client on mount
    - Unregisters forms on unmount

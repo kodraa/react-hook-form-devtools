@@ -13,14 +13,14 @@ A minimal React Hook Form devtools implementation based on the TanStack DevTools
    - Defines `FormState` type and event map
    - Creates singleton `DevtoolsEventClient` instance
 
-2. **`apps/web/src/lib/rhf-devtools/DevtoolsPanel.tsx`**
+2. **`apps/web/src/lib/rhf-devtools/devtools-panel.tsx`**
    - React component that renders the devtools UI
    - Displays form state, values, errors, touched/dirty fields
    - Supports multiple forms with dropdown selection
    - Color-coded status badges for form state
 
-3. **`apps/web/src/lib/rhf-devtools/useRHFDevtools.ts`**
-   - Custom hook for registering React Hook Form instances
+3. **`apps/web/src/lib/rhf-devtools/rhf-devtools.ts`**
+   - Component for registering React Hook Form instances
    - Automatically watches form state changes
    - Emits updates to the devtools panel
    - Handles cleanup on unmount
@@ -77,7 +77,7 @@ A minimal React Hook Form devtools implementation based on the TanStack DevTools
 │  │             Form Component                        │  │
 │  │                                                   │  │
 │  │  const form = useForm()                          │  │
-│  │  useRHFDevtools(form, 'my-form')  ──────────┐   │  │
+│  │  <RHFDevtools formId="my-form" /> ──────────┐   │  │
 │  │                                              │   │  │
 │  └──────────────────────────────────────────────┼───┘  │
 │                                                 │      │
@@ -103,8 +103,8 @@ A minimal React Hook Form devtools implementation based on the TanStack DevTools
 ## Usage Example
 
 ```tsx
-import { useForm } from 'react-hook-form'
-import { useRHFDevtools } from '@/lib/rhf-devtools'
+import { useForm, FormProvider } from 'react-hook-form'
+import { RHFDevtools } from '@/lib/rhf-devtools'
 
 function MyForm() {
   const form = useForm({
@@ -114,15 +114,15 @@ function MyForm() {
     },
   })
 
-  // Register with devtools - that's it!
-  useRHFDevtools(form, 'my-form')
-
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>
-      <input {...form.register('username')} />
-      <input {...form.register('email')} />
-      <button type="submit">Submit</button>
-    </form>
+    <FormProvider {...form}>
+      <RHFDevtools formId="my-form" />
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <input {...form.register('username')} />
+        <input {...form.register('email')} />
+        <button type="submit">Submit</button>
+      </form>
+    </FormProvider>
   )
 }
 ```
@@ -149,15 +149,16 @@ Modify `DevtoolsPanel.tsx` to add:
 - Field-level history
 - Performance metrics
 
-### 3. Add Hook Options
-Extend `useRHFDevtools` to accept options:
+### 3. Add Component Options
+Extend `RHFDevtools` to accept options:
 
 ```typescript
-useRHFDevtools(form, 'my-form', {
-  trackHistory: true,
-  captureSnapshots: true,
-  performanceMetrics: true,
-})
+<RHFDevtools 
+  formId="my-form" 
+  trackHistory={true}
+  captureSnapshots={true}
+  performanceMetrics={true}
+/>
 ```
 
 ### 4. Create Additional Hooks

@@ -20,9 +20,9 @@ packages/rhf-devtools/
 │   ├── index.d.ts          # TypeScript definitions
 │   └── ...maps             # Source maps
 ├── src/                     # Source files
-│   ├── DevtoolsPanel.tsx   # Main devtools UI component
+│   ├── devtools-panel.tsx  # Main devtools UI component
 │   ├── eventClient.ts      # Event client for form registration
-│   ├── useRHFDevtools.ts   # Hook for registering forms
+│   ├── rhf-devtools.ts     # Component for registering forms
 │   └── index.ts            # Main export file
 ├── package.json             # Package configuration
 ├── tsconfig.json            # TypeScript configuration
@@ -38,14 +38,14 @@ packages/rhf-devtools/
 
 ### Core Files
 
-- **DevtoolsPanel.tsx**: Fully self-contained devtools panel with:
+- **devtools-panel.tsx**: Fully self-contained devtools panel with:
   - Inline styles (no external CSS dependencies)
   - Custom SVG icons (no lucide-react dependency)
   - Collapsible sections
   - Array-based GetValuesOnDemand interface
   - Watched fields functionality
 - **eventClient.ts**: TanStack-based event client for form registration
-- **useRHFDevtools.ts**: React hook for easy form registration
+- **rhf-devtools.ts**: React component for easy form registration
 - **index.ts**: Clean public API exports
 
 ### Configuration Files
@@ -171,7 +171,7 @@ npm install your-package-name
 
 ```tsx
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import { RHFDevtoolsPanel, useRHFDevtools } from "your-package-name";
+import { RHFDevtoolsPanel, RHFDevtools } from "your-package-name";
 
 // In root component
 function App() {
@@ -194,9 +194,13 @@ function App() {
 // In form component
 function MyForm() {
   const form = useForm();
-  useRHFDevtools(form, "my-form");
 
-  return <form>...</form>;
+  return (
+    <FormProvider {...form}>
+      <RHFDevtools formId="my-form" />
+      <form>...</form>
+    </FormProvider>
+  );
 }
 ```
 

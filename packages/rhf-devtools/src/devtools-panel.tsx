@@ -163,7 +163,7 @@ export default function RHFDevtoolsPanel() {
                 <TouchedFieldsSection />
                 <DirtyFieldsSection />
                 <Separator />
-                <GetValuesOnDemand />
+                {/* <GetValuesOnDemand /> */}
                 <Separator />
                 <WatchedFieldsSection />
               </div>
@@ -570,6 +570,7 @@ const WatchedFieldRow = ({
   const { control } = useFormContext();
   const value = useWatch({
     control,
+    // @ts-expect-error - fieldName can be undefined
     name: fieldName === "--" ? undefined : fieldName,
   });
 
@@ -656,6 +657,7 @@ const WatchedFieldRow = ({
   );
 };
 
+// @ts-expect-error - commented for now
 const GetValuesOnDemand = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const { getValues, getFieldState } = useFormContext();

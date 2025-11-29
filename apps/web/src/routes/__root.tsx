@@ -10,7 +10,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import Header from "../components/header";
 import appCss from "../index.css?url";
-import { RHFDevtoolsPanel } from "@/lib/rhf-devtools";
+import { RHFDevtoolsPanel } from "@nourkodra/react-hook-form-devtools";
 
 export interface RouterAppContext {}
 

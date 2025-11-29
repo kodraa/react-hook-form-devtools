@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { DevtoolsEventClient } from "./event-client";
 import { useFormContext, useWatch, FormProvider } from "react-hook-form";
 
-// Icon components
 const ChevronDown = ({ size = 16 }: { size?: number }) => (
   <svg
     width={size}
@@ -157,19 +156,13 @@ export default function RHFDevtoolsPanel() {
           {formState && formMethods && (
             <FormProvider {...formMethods}>
               <div>
-                <FormStateSection
-                  formState={formState}
-                  formMethods={formMethods}
-                />
+                <FormStateSection />
                 <Separator />
-                <ValuesSection values={formState.values} />
+                <ValuesSection />
                 <Separator />
-                <TouchedFieldsSection touchedFields={formState.touchedFields} />
-                {Object.keys(formState.touchedFields).length > 0 && (
-                  <Separator />
-                )}
-                <DirtyFieldsSection dirtyFields={formState.dirtyFields} />
-                {Object.keys(formState.dirtyFields).length > 0 && <Separator />}
+                <TouchedFieldsSection />
+                <DirtyFieldsSection />
+                <Separator />
                 <GetValuesOnDemand />
                 <Separator />
                 <WatchedFieldsSection />
@@ -182,18 +175,14 @@ export default function RHFDevtoolsPanel() {
   );
 }
 
-const FormStateSection = ({
-  formState,
-  formMethods,
-}: {
-  formState: {
-    isDirty: boolean;
-    isValid: boolean;
-    isSubmitting: boolean;
-  };
-  formMethods: ReturnType<typeof useFormContext>;
-}) => {
+const FormStateSection = () => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const formMethods = useFormContext();
+  const formState = {
+    isDirty: formMethods.formState.isDirty,
+    isValid: formMethods.formState.isValid,
+    isSubmitting: formMethods.formState.isSubmitting,
+  };
 
   return (
     <div style={{ marginBottom: "12px" }}>
@@ -281,13 +270,10 @@ const FormStateSection = ({
   );
 };
 
-const TouchedFieldsSection = ({
-  touchedFields,
-}: {
-  touchedFields: Record<string, unknown>;
-}) => {
+const TouchedFieldsSection = () => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const fieldKeys = Object.keys(touchedFields);
+  const { formState } = useFormContext();
+  const fieldKeys = Object.keys(formState.touchedFields);
 
   if (fieldKeys.length === 0) return null;
 
@@ -332,13 +318,10 @@ const TouchedFieldsSection = ({
   );
 };
 
-const DirtyFieldsSection = ({
-  dirtyFields,
-}: {
-  dirtyFields: Record<string, unknown>;
-}) => {
+const DirtyFieldsSection = () => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const fieldKeys = Object.keys(dirtyFields);
+  const { formState } = useFormContext();
+  const fieldKeys = Object.keys(formState.dirtyFields);
 
   if (fieldKeys.length === 0) return null;
 
@@ -455,8 +438,10 @@ const SelectForm = ({
   );
 };
 
-const ValuesSection = ({ values }: { values: unknown }) => {
+const ValuesSection = () => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const { getValues } = useFormContext();
+  const values = getValues();
 
   return (
     <div style={{ marginBottom: "12px" }}>

@@ -9,17 +9,13 @@
   "orm": "none",
   "backend": "none",
   "runtime": "none",
-  "frontend": [
-    "tanstack-start"
-  ],
-  "addons": [
-    "turborepo"
-  ],
+  "frontend": ["tanstack-start"],
+  "addons": ["turborepo"],
   "examples": [],
   "auth": "none",
   "packageManager": "bun",
   "dbSetup": "none",
   "api": "none",
-  "webDeploy": "none",
+  "webDeploy": "netlify",
   "serverDeploy": "none"
 }

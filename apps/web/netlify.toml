@@ -1,0 +1,34 @@
+[build]
+  # Build command for TanStack Start
+  command = "bun run build"
+
+  # Publish directory for static assets
+  publish = "dist/client"
+
+[build.environment]
+  # Node version for Netlify
+  NODE_VERSION = "18"
+
+  # Environment variables
+  NODE_ENV = "production"
+
+# Handle API routes and SSR through Netlify Functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/server"
+  status = 200
+
+# SPA fallback for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

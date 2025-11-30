@@ -1,0 +1,7 @@
+[build]
+  base = "apps/web"
+  command = "cd ../.. && bun install && cd apps/web && bun run build"
+  publish = "dist/client"
+
+[build.environment]
+  NODE_VERSION = "22.12"

@@ -13,22 +13,6 @@ export const Route = createFileRoute("/")({
   component: HomeComponent,
 });
 
-const TITLE_TEXT = `
- ██████╗ ███████╗████████╗████████╗███████╗██████╗
- ██╔══██╗██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗
- ██████╔╝█████╗     ██║      ██║   █████╗  ██████╔╝
- ██╔══██╗██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗
- ██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║
- ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝
-
- ████████╗    ███████╗████████╗ █████╗  ██████╗██╗  ██╗
- ╚══██╔══╝    ██╔════╝╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝
-    ██║       ███████╗   ██║   ███████║██║     █████╔╝
-    ██║       ╚════██║   ██║   ██╔══██║██║     ██╔═██╗
-    ██║       ███████║   ██║   ██║  ██║╚██████╗██║  ██╗
-    ╚═╝       ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
- `;
-
 type FormData = {
   username: string;
   email: string;
@@ -78,7 +62,7 @@ function HomeComponent() {
     <Form {...form}>
       <div className="container mx-auto max-w-3xl px-4 py-2">
         <RHFDevtools formId="example-form" />
-        <pre className="overflow-x-auto font-mono text-sm">{TITLE_TEXT}</pre>
+        {/* <pre className="overflow-x-auto font-mono text-sm">{TITLE_TEXT}</pre> */}
         <div className="grid gap-6">
           <section className="rounded-lg border p-6">
             <h2 className="mb-4 text-xl font-medium">

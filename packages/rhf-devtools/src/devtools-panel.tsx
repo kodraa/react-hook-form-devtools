@@ -64,7 +64,6 @@ const X = ({ size = 16 }: { size?: number }) => (
   </svg>
 );
 
-// Separator component
 const Separator = () => (
   <div
     style={{
@@ -81,10 +80,8 @@ export default function RHFDevtoolsPanel() {
   const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Initialize with already registered forms
     setFormIds(DevtoolsEventClient.getRegisteredFormIds());
 
-    // Subscribe to form registration events
     const cleanupRegister = DevtoolsEventClient.on("register-form", (e) => {
       setFormIds((prev) => {
         if (!prev.includes(e.payload.formId)) {
@@ -94,7 +91,6 @@ export default function RHFDevtoolsPanel() {
       });
     });
 
-    // Subscribe to form unregistration events
     const cleanupUnregister = DevtoolsEventClient.on("unregister-form", (e) => {
       setFormIds((prev) => prev.filter((id) => id !== e.payload.formId));
     });
@@ -105,12 +101,10 @@ export default function RHFDevtoolsPanel() {
     };
   }, []);
 
-  // Get form methods from the store
   const formMethods = selectedFormId
     ? DevtoolsEventClient.getFormMethods(selectedFormId)
     : undefined;
 
-  // Get form state directly from form methods
   const formState = formMethods
     ? {
         values: formMethods.getValues(),
@@ -123,12 +117,11 @@ export default function RHFDevtoolsPanel() {
       }
     : null;
 
-  // Subscribe to form state changes for re-rendering
   useEffect(() => {
     if (!formMethods) return;
 
     const subscription = formMethods.watch(() => {
-      // Force re-render when form state changes
+      // force re-render when form state changes
       setFormIds((prev) => [...prev]);
     });
 

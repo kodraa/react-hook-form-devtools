@@ -14,13 +14,13 @@ A minimal devtools implementation for React Hook Form built using TanStack DevTo
 ## Installation
 
 ```bash
-npm install react-hook-form-devtools
+npm install @kodraa/react-hook-form-devtools
 # or
-yarn add react-hook-form-devtools
+yarn add @kodraa/react-hook-form-devtools
 # or
-pnpm add react-hook-form-devtools
+pnpm add @kodraa/react-hook-form-devtools
 # or
-bun add react-hook-form-devtools
+bun add @kodraa/react-hook-form-devtools
 ```
 
 ## Peer Dependencies
@@ -37,7 +37,7 @@ npm install react react-dom react-hook-form @tanstack/react-devtools
 
 ```tsx
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import { RHFDevtoolsPanel } from "react-hook-form-devtools";
+import { RHFDevtoolsPanel } from "@kodraa/react-hook-form-devtools";
 
 function App() {
   return (
@@ -62,7 +62,7 @@ function App() {
 
 ```tsx
 import { useForm, FormProvider } from "react-hook-form";
-import { RHFDevtools } from "react-hook-form-devtools";
+import { RHFDevtools } from "@kodraa/react-hook-form-devtools";
 
 function MyForm() {
   const form = useForm({
